@@ -1,0 +1,102 @@
+@charset "utf-8";
+/* CSS Document */
+
+html,body{
+	height: 100%;
+	overflow: hidden;
+}
+
+
+p{
+	margin: 0px;
+}
+
+body{
+	font-family: 'VT323', monospace;
+	font-size: 18px;
+	margin: 0;
+	color:#3cac49;
+}
+
+#container{
+	height: 100%;
+	background-color:#275c42;
+	margin: 0 auto;
+	text-align: center;
+	position: relative;
+	padding: 0;
+}
+
+#mainStory{
+	height: 30%;
+	margin: 0 auto;
+	background-color:#275c42;
+	vertical-align: middle;
+}
+
+#mainstoryText{
+	padding: 5px 0 0 0;
+}
+
+#responseBlok{
+	color:#f0a835;
+	height: 54%;
+	margin: 0 auto;
+	background-color:#9e2836;
+}
+
+#response{
+	
+}
+
+#responsePadding{
+	padding: 5px 0 0 0;
+}
+
+#inputField{
+	 box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+	width: 100%;
+	height: 16%;
+	background-color: #262b44;
+	border: 5px #665743 solid; 
+}
+
+#inputPadding{
+	padding: .5em 0 0 0;
+}
+
+input:focus{
+	 outline: none;
+}
+
+#typeHere{
+	height: 100%;
+	width: 100%;
+	overflow: hidden;
+	font-size: 20px;
+	border:none; 
+	text-align: center;
+	background: transparent;
+	color:#124e89;
+	font-family: 'VT323', monospace;
+}
+
+
+.typed-cursor{
+	opacity: 1;
+	animation: typedjsBlink 1s infinite;
+	-webkit-animation: typedjsBlink 1s infinite;
+	animation: typedjsBlink 1s infinite;
+	margin:0 0 0 2px;
+}
+@keyframes typedjsBlink{
+	50% { opacity: 0.0; }
+}
+@-webkit-keyframes typedjsBlink{
+	0% { opacity: 1; }
+	50% { opacity: 0.0; }
+	100% { opacity: 1; }
+}
+
