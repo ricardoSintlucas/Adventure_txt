@@ -106,7 +106,7 @@ function Door(name, description, doorKeyID) {
 			let answers = [];
 			answers[0] = "You entered: " + currentSpace.getName();
 			answers[1] = currentSpace.getDescription();
-			console.log(currentSpace.objects[2]);
+			//console.log(currentSpace.objects[2]);
 			return answers;
 
 		} else {

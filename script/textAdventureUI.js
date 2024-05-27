@@ -1,5 +1,40 @@
 // JavaScript Document
 $(document).ready(function () {
+
+
+	$.getJSON('script/environment.json', function (data) {
+		// Now you can use your data
+		processData(data);
+	})
+		.fail(function (jqXHR, textStatus, error) {
+			console.error('Error:', error);
+		});
+
+
+	function processData(data) {
+		//process the data
+		data.rooms.forEach(room => {
+			let tempName = room.name;
+			tempName = tempName.replace(/\s/g, '');
+			let tempItems = [];
+			for (let i = 0; i < room.items.length; i++) {
+				let item = room.items[i];
+				if (item.portable) {
+					tempItems.push(new PortableItem(item.name, item.description));
+				} else {
+					tempItems.push(new StaticItem(item.name, item.description));
+				}
+			}
+			//console.log(tempItems);
+			gameObjects[tempName] = new Room(room.name, room.description, tempItems);
+		});
+
+		console.log(gameObjects.LivingRoom);
+	}
+
+
+	let gameObjects = {};
+
 	/////////////////
 	//set variables
 	/////////////////
@@ -40,7 +75,7 @@ $(document).ready(function () {
 
 	//set the main story here 
 	mainStory1_01 = "You wake up in a room on the floor.<br>And you don't know where you are...";
-	$("#mainstoryText").html(mainStory1_01);
+	$("#mainStory").html(mainStory1_01);
 
 	//test classes with making objects
 
@@ -124,20 +159,22 @@ $(document).ready(function () {
 		}
 	});
 
-	function setAnswer(placeholder, answer, cursor) {
+	function setAnswer(placeholder, answer, cursor, input) {
 		//make the response div empty 
 		$(placeholder).empty();
 
 		//remove all .typed-cursor that is set bij the Typed script 
 		$(".typed-cursor").remove();
 
-		//execute Typed function in the #response div with the $answer
+
+		//execute Typed function in the #responseBlok div with the $answer
 		let typed = new Typed(placeholder, {
 			strings: [answer],
 			typeSpeed: 20,
 			backSpeed: 0,
-			showCursor: cursor
+
 		});
+
 	}
 
 
@@ -277,106 +314,83 @@ $(document).ready(function () {
 		let convertType = typed.toLowerCase();
 
 		switch (convertType) {
-			case "look around":
-			case "look space":
+			case includes("look around"):
 				//give description of the space.
-				setAnswer("#response", lookAround(), true);
-				break;
+				setAnswer("#responseBlok", lookAround(), true);
+
 			case "stand up":
 			case "get up":
-				setAnswer("#response", "You get up", true);
+				setAnswer("#responseBlok", "You get up", true);
 				break;
-			case "walk to wooden door":
-			case "go to wooden door":
-				setAnswer("#response", checkItemInCurrentRoom("wooden door"), true);
+			case includes("to wooden door"):
+				setAnswer("#responseBlok", checkItemInCurrentRoom("wooden door"), true);
 				break;
-			case "walk to wooden green door":
-			case "go to wooden green door":
-			case "walk to green door":
-			case "go to green door":
-				setAnswer("#response", checkItemInCurrentRoom("wooden green door"), true);
+			case includes("to green door"):
+				setAnswer("#responseBlok", checkItemInCurrentRoom("wooden green door"), true);
 				break;
-			case "walk to person":
 			case "walk to man":
-			case "go to person":
 			case "go to man":
-				setAnswer("#response", checkItemInCurrentRoom("Jim"), true);
+				setAnswer("#responseBlok", checkItemInCurrentRoom("Jim"), true);
 				break;
 			case "open door":
-				setAnswer("#response", "Which door? ", true);
+				setAnswer("#responseBlok", "Which door? ", true);
 				break;
-			case "look at coffee table":
-			case "see coffee table":
-			case "check coffee table":
-				setAnswer("#response", checkContainer(currentSpace.objects[2]), true);
-				console.log(currentSpace.objects[2]);
+			case includes("coffee table"):
+				setAnswer("#responseBlok", checkContainer(currentSpace.objects[2]), true);
 				break;
-			case "take rusty key":
-			case "get rusty key":
-			case "grab rusty key":
-			case "pick up rusty key":
-				setAnswer("#response", getItem("rusty key", currentSpace.objects[2]), true);
+			case includes("rusty key"):
+				setAnswer("#responseBlok", getItem("rusty key", currentSpace.objects[2]), true);
 				break;
-			case "what is your name?":
-			case "what is your name":
+			case includes("what is your name"):
 				if (checkCharacterInRoom("Jim")) {
-					setAnswer("#response", "Nobody here...", true);
+					setAnswer("#responseBlok", "Nobody here...", true);
 				} else {
-					setAnswer("#response", person.getName(), true);
+					setAnswer("#responseBlok", person.getName(), true);
 				}
 				break;
-			case "which key fits in the door?":
-			case "which key fits in the door":
+			case includes("which key fits in the door"):
 				if (checkCharacterInRoom("Jim")) {
-					setAnswer("#response", person.getAnswer("which key fits in the door"), true);
+					setAnswer("#responseBlok", person.getAnswer("which key fits in the door"), true);
 				} else {
-					setAnswer("#response", "There is nodbody in the room...", true);
+					setAnswer("#responseBlok", "There is nodbody in the room...", true);
 				}
 				break;
-			case "what are you doing here?":
-			case "what are you doing here":
-				setAnswer("#response", person.getAnswer("what are you doing here"), true);
+			case includes("what are you doing here"):
+				setAnswer("#responseBlok", person.getAnswer("what are you doing here"), true);
 				break;
-			case "take blue key":
-			case "get blue key":
-			case "grab blue key":
-			case "pick up blue key":
-				setAnswer("#response", getItem("blue key", currentSpace.objects[2]), true);
+			case includes("blue key"):
+				setAnswer("#responseBlok", getItem("blue key", currentSpace.objects[2]), true);
 				break;
-			case "take ball":
-			case "get ball":
-			case "grab ball":
-			case "pick up ball":
-				setAnswer("#response", getItem("ball", currentSpace.objects[2]), true);
+			case includes("ball"):
+				setAnswer("#responseBlok", getItem("ball", currentSpace.objects[2]), true);
 				break;
-			case "take apple":
-			case "get apple":
-			case "grab apple":
-			case "pick up appple":
-				setAnswer("#response", getItem("apple", currentSpace.objects[2]), true);
+			case "pick up apple":
+			case "pick up the apple":
+			case "pick up an apple":
+				setAnswer("#responseBlok", getItem("apple", currentSpace.objects[2]), true);
 				break;
 			case "open door with key":
 			case "use key on door":
-				setAnswer("#response", "Which door?", true);
+				setAnswer("#responseBlok", "Which door?", true);
 				break;
 			case "open green wooden door":
 			case "open green door":
 				answers = doorLivingroomToHallway.openDoor();
 				if (jQuery.type(answers) === "array") {
-					setAnswer("#mainstoryText", answers[1], true);
-					setAnswer("#response", answers[0], true);
+					setAnswer("#mainStory", answers[1], true);
+					setAnswer("#responseBlok", answers[0], true);
 				} else {
-					setAnswer("#response", answers, true);
+					setAnswer("#responseBlok", answers, true);
 				}
 				break;
 			case "open wooden door":
 				answers = doorLivingroomToKitchen.openDoor();
 
 				if (jQuery.type(answers) === "array") {
-					setAnswer("#mainstoryText", answers[1], true);
-					setAnswer("#response", answers[0], true);
+					setAnswer("#mainStory", answers[1], true);
+					setAnswer("#responseBlok", answers[0], true);
 				} else {
-					setAnswer("#response", answers, true);
+					setAnswer("#responseBlok", answers, true);
 				}
 				break;
 
@@ -390,10 +404,10 @@ $(document).ready(function () {
 
 				answers = doorLivingroomToHallway.openDoor();
 				if (jQuery.type(answers) === "array") {
-					setAnswer("#mainstoryText", answers[1], true);
-					setAnswer("#response", answers[0], true);
+					setAnswer("#mainStory", answers[1], true);
+					setAnswer("#responseBlok", answers[0], true);
 				} else {
-					setAnswer("#response", answers, true);
+					setAnswer("#responseBlok", answers, true);
 				}
 				break;
 			case "use blue key on green door":
@@ -407,10 +421,10 @@ $(document).ready(function () {
 				answers = doorLivingroomToHallway.openDoor();
 
 				if (jQuery.type(answers) === "array") {
-					setAnswer("#mainstoryText", answers[1], true);
-					setAnswer("#response", answers[0], true);
+					setAnswer("#mainStory", answers[1], true);
+					setAnswer("#responseBlok", answers[0], true);
 				} else {
-					setAnswer("#response", answers, true);
+					setAnswer("#responseBlok", answers, true);
 				}
 
 				break;
@@ -424,10 +438,10 @@ $(document).ready(function () {
 
 				answers = doorHallwayToOutside.openDoor();
 				if (jQuery.type(answers) === "array") {
-					setAnswer("#mainstoryText", answers[1], true);
-					setAnswer("#response", answers[0], true);
+					setAnswer("#mainStory", answers[1], true);
+					setAnswer("#responseBlok", answers[0], true);
 				} else {
-					setAnswer("#response", answers, true);
+					setAnswer("#responseBlok", answers, true);
 				}
 				break;
 			case "use rusty key on front door":
@@ -441,36 +455,36 @@ $(document).ready(function () {
 
 				answers = doorHallwayToOutside.openDoor();
 				if (jQuery.type(answers) === "array") {
-					setAnswer("#mainstoryText", answers[1], true);
-					setAnswer("#response", answers[0], true);
+					setAnswer("#mainStory", answers[1], true);
+					setAnswer("#responseBlok", answers[0], true);
 				} else {
-					setAnswer("#response", answers, true);
+					setAnswer("#responseBlok", answers, true);
 				}
 				break;
 			case "open front door":
 				answers = doorHallwayToOutside.openDoor();
 
 				if (jQuery.type(answers) === "array") {
-					setAnswer("#mainstoryText", answers[1], true);
-					setAnswer("#response", answers[0], true);
+					setAnswer("#mainStory", answers[1], true);
+					setAnswer("#responseBlok", answers[0], true);
 				} else {
-					setAnswer("#response", answers, true);
+					setAnswer("#responseBlok", answers, true);
 				}
 				break;
 			case "check my inventory":
 			case "check inventory":
-				setAnswer("#response", checkContainer(currentInventory), true);
+				setAnswer("#responseBlok", checkContainer(currentInventory), true);
 				break;
 			case "eat apple":
 				item = checkItemInventory("apple");
 				if (item !== undefined) {
-					setAnswer("#response", item.getName(), true);
+					setAnswer("#responseBlok", item.getName(), true);
 				} else {
-					setAnswer("#response", "You don't have an apple", true);
+					setAnswer("#responseBlok", "You don't have an apple", true);
 				}
 				break;
 			default:
-				setAnswer("#response", giveRandomAnswer(defaultAnswer) + convertType, true);
+				setAnswer("#responseBlok", giveRandomAnswer(defaultAnswer) + convertType, true);
 		}
 	}
 

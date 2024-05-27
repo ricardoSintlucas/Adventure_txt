@@ -1,0 +1,125 @@
+{
+    "rooms": [
+        {
+            "name": "Living Room",
+            "description": "A cozy living room with a fireplace.",
+            "items": [
+                {
+                    "name": "Bookshelf",
+                    "description": "A wooden bookshelf filled with books.",
+                    "portable": false,
+                    "items": [
+                        {
+                            "name": "Red Book",
+                            "description": "A red book.",
+                            "portable": true
+                        },
+                        {
+                            "name": "Blue Book",
+                            "description": "A blue book.",
+                            "portable": true
+                        }
+                    ]
+                },
+                {
+                    "name": "Coffee Table",
+                    "description": "A small coffee table with some items.",
+                    "portable": false,
+                    "items": [
+                        {
+                            "name": "Rusty Key",
+                            "description": "A rusty key.",
+                            "portable": true,
+                            "keycode": 123
+                        },
+                        {
+                            "name": "Blue Key",
+                            "description": "A blue key.",
+                            "portable": true,
+                            "keycode": 213
+                        }
+                    ]
+                },
+                {
+                    "name": "Couch",
+                    "description": "A comfy couch with a throw blanket.",
+                    "portable": false
+                }
+            ],
+            "persons": [
+                {
+                    "name": "John",
+                    "description": "A friendly man sitting on the couch."
+                }
+            ],
+            "doors": [
+                {
+                    "name": "Wooden Door",
+                    "description": "A door leading to the kitchen.",
+                    "leadsTo": "Kitchen",
+                    "keycode": 123
+                }
+                {
+                    "name": "Green Door",
+                    "description": "A door leading to the hallway.",
+                    "leadsTo": "hallway",
+                    "keycode": 213
+                }
+            ]
+        },
+        {
+            "name": "Kitchen",
+            "description": "A modern kitchen with stainless steel appliances.",
+            "items": [
+                {
+                    "name": "Cutting Board",
+                    "description": "A wooden cutting board.",
+                    "portable": true
+                },
+                {
+                    "name": "Knife Set",
+                    "description": "A set of sharp knives.",
+                    "portable": true
+                }
+            ],
+            "persons": [
+                {
+                    "name": "Sarah",
+                    "description": "A skilled chef preparing a meal."
+                }
+            ],
+            "doors": [
+                {
+                    "name": "Wooden Door",
+                    "description": "A door leading back to the living room.",
+                    "leadsTo": "Living Room",
+                    "key": 123
+                }
+            ]
+        },
+        {
+            "name": "Hallway",
+            "description": "A narrow hallway with doors on either side.",
+            "items": [
+                {
+                    "name": "Painting",
+                    "description": "A beautiful painting of a landscape.",
+                    "portable": false
+                }
+            ],
+            "doors": [
+                {
+                    "name": "Red Door",
+                    "description": "A door leading to the bedroom.",
+                    "leadsTo": "Bedroom"
+                },
+                {
+                    "name": "Green Door",
+                    "description": "A door leading back to the living room.",
+                    "leadsTo": "Living Room",
+                    "keycode": 213
+                }
+            ]
+        }
+    ]
+}
