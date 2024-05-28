@@ -66,60 +66,6 @@
                     "keycode": 213
                 }
             ]
-        },
-        {
-            "name": "Kitchen",
-            "description": "A modern kitchen with stainless steel appliances.",
-            "items": [
-                {
-                    "name": "Cutting Board",
-                    "description": "A wooden cutting board.",
-                    "portable": true
-                },
-                {
-                    "name": "Knife Set",
-                    "description": "A set of sharp knives.",
-                    "portable": true
-                }
-            ],
-            "persons": [
-                {
-                    "name": "Sarah",
-                    "description": "A skilled chef preparing a meal."
-                }
-            ],
-            "doors": [
-                {
-                    "name": "Wooden Door",
-                    "description": "A door leading back to the living room.",
-                    "leadsTo": "Living Room",
-                    "key": 123
-                }
-            ]
-        },
-        {
-            "name": "Hallway",
-            "description": "A narrow hallway with doors on either side.",
-            "items": [
-                {
-                    "name": "Painting",
-                    "description": "A beautiful painting of a landscape.",
-                    "portable": false
-                }
-            ],
-            "doors": [
-                {
-                    "name": "Red Door",
-                    "description": "A door leading to the bedroom.",
-                    "leadsTo": "Bedroom"
-                },
-                {
-                    "name": "Green Door",
-                    "description": "A door leading back to the living room.",
-                    "leadsTo": "Living Room",
-                    "keycode": 213
-                }
-            ]
         }
     ]
 }

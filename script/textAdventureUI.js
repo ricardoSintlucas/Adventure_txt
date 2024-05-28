@@ -1,6 +1,7 @@
 // JavaScript Document
 $(document).ready(function () {
 
+	"use strict";
 
 	$.getJSON('script/environment.json', function (data) {
 		// Now you can use your data
@@ -38,7 +39,7 @@ $(document).ready(function () {
 	/////////////////
 	//set variables
 	/////////////////
-	"use strict";
+
 	let mainStory1_01;
 	let whatIsTyped;
 	//If a function needs to return two answers
