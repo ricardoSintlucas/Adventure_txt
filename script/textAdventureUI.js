@@ -1,7 +1,17 @@
 // JavaScript Document
 $(document).ready(function () {
 
-	"use strict";
+
+	// store the game objects in a dictionary
+	let gameObjects = {};
+	//If a function needs to return two answers
+	let whatIsTyped;
+	//Set variable item 
+	let item
+
+	//conditions and responses
+	let conditions = {};
+	let responses = {};
 
 	$.getJSON('script/environment.json', function (data) {
 		// Now you can use your data
@@ -14,131 +24,88 @@ $(document).ready(function () {
 
 	function processData(data) {
 		//process the data
+
 		data.rooms.forEach(room => {
 			let tempName = room.name;
 			tempName = tempName.replace(/\s/g, '');
 			let tempItems = [];
+			let itemWithin = [];
+			//store the items in the room
 			for (let i = 0; i < room.items.length; i++) {
 				let item = room.items[i];
+				itemWithin = item.items;
+				if (itemWithin !== undefined) {
+
+					for (let j = 0; j < itemWithin.length; j++) {
+						let itemInItem = itemWithin[j];
+						if (itemInItem.portable) {
+							tempItems.push(new PortableItem(itemInItem.name, itemInItem.description, itemInItem.items));
+						} else {
+							tempItems.push(new StaticItem(itemInItem.name, itemInItem.description, itemInItem.items));
+						}
+					}
+				}
 				if (item.portable) {
-					tempItems.push(new PortableItem(item.name, item.description));
+					tempItems.push(new PortableItem(item.name, item.description, itemWithin));
 				} else {
-					tempItems.push(new StaticItem(item.name, item.description));
+					tempItems.push(new StaticItem(item.name, item.description, itemWithin));
 				}
 			}
-			//console.log(tempItems);
+			//store the doors in the room
+			for (let i = 0; i < room.doors.length; i++) {
+				let door = room.doors[i];
+				//door.setSpaces(gameObjects[tempName], gameObjects[door.leadsTo]);
+				let newDoor = new Door(door.name, door.description, door.keycode);
+				newDoor.setSpaces(gameObjects[tempName], gameObjects[door.leadsTo]);
+				tempItems.push(newDoor);
+			}
+			//store the characters in the room
+			for (let j = 0; j < room.persons.length; j++) {
+				let person = room.persons[j];
+				tempItems.push(new Character(person.name, person.description, person.items, person.dialogue));
+			}
+
 			gameObjects[tempName] = new Room(room.name, room.description, tempItems);
+			console.log(tempItems);
+
 		});
 
-		console.log(gameObjects.LivingRoom);
+		/*
+		for (let i = 0; i < gameObjects["LivingRoom"].objects.length; i++) {
+			let object = gameObjects["LivingRoom"].objects[i];
+			if (object instanceof Door) {
+				console.log(object.getName() + ' is a Door');
+			} else if (object instanceof Character) {
+				console.log(object.getName() + ' is a Character');
+			} else if (object instanceof Key) {
+				console.log(object.getName() + ' is a Key');
+			} else if (object instanceof PortableItem) {
+				console.log(object.getName() + ' is a PortableItem');
+
+			} else if (object instanceof StaticItem) {
+				console.log(object.getName() + ' is a StaticItem');
+			} else {
+				console.log(object.getName() + ' is an unknown type');
+			}
+		}*/
+
+
+		function respondToInput(input) {
+			input = input.toLowerCase();
+			for (let condition in conditions) {
+				console.log(conditions[condition]);
+				if (conditions[condition].every(word => input.includes(word))) {
+					return responses[condition];
+				}
+			}
+
+			return responses.default;
+		}
+
+
+		currentSpace = gameObjects.LivingRoom;
+		console.log(currentSpace);
 	}
-
-
-	let gameObjects = {};
-
-	/////////////////
-	//set variables
-	/////////////////
-
-	let mainStory1_01;
-	let whatIsTyped;
-	//If a function needs to return two answers
-	let answers;
-	//Set variable item 
-	let item
-
-	//setup all the objects names
-
-	//doors
-	var doorLivingroomToKitchen;
-	var doorLivingroomToHallway;
-	var doorHallwayToOutside;
-
-	//other Items
-	var coffeeTable;
-
-	//keys
-	let keyLivingroomToHallway;
-	let keyHallwaytoOutside;
-
-	//Items 
-	let ball;
-	let apple;
-
-	//Persons
-	let person;
-
-	//spaces
-	let livingRoom;
-	let kitchen;
-	let hallway;
-	let outside;
-
-	//set the main story here 
-	mainStory1_01 = "You wake up in a room on the floor.<br>And you don't know where you are...";
-	$("#mainStory").html(mainStory1_01);
-
-	//test classes with making objects
-
-	doorLivingroomToKitchen = new Door("wooden door",
-		"You can go from the livinging room to the kitchen and back");
-
-	doorLivingroomToHallway = new Door("wooden green door",
-		"You can go from the livinging room to the hallway and back",
-		123);
-	doorHallwayToOutside = new Door("front door",
-		"You can go outside the house and back",
-		213);
-
-	apple = new PortableItem("apple",
-		"A tasty red apple");
-
-	person = new Character("Jim",
-		"He is standing in the corner. Looks like a nice guy",
-		[apple],
-		[["which key fits in the door", "I think it was the rusty key."],
-		["what are you doing here", "I don't know."]
-		]);
-
-	keyLivingroomToHallway = new Key("rusty key",
-		"This is the key that opens the door to the hallway",
-		123);
-	keyHallwaytoOutside = new Key("blue key",
-		"This is the key that opens the front door",
-		213);
-	ball = new PortableItem("ball",
-		"A small rubber ball");
-
-	coffeeTable = new StaticItem("coffee table",
-		"A small coffee table",
-		[keyLivingroomToHallway, keyHallwaytoOutside, ball]);
-
-
-	livingRoom = new Room("living room",
-		"It's a well lite room and there are two doors opposite of eachother. One wooden door and a green wooden door. There's a man and there is a coffee table.",
-		[doorLivingroomToKitchen, doorLivingroomToHallway, coffeeTable, person]);
-
-	kitchen = new Room("kitchen",
-		"The kitchen... Only one door. the wooden one.",
-		[doorLivingroomToKitchen]);
-
-	hallway = new Room("hallway",
-		"This is the hallway. You see light comming in through the glass window next to the front door. And there is the green woodendoor to the living room.",
-		[doorLivingroomToHallway, doorHallwayToOutside]);
-
-	outside = new StaticItem("outside",
-		"It's a forrest and it's a sunny day",
-		[doorHallwayToOutside]);
-
-
-	//set the rooms that are connected to this door. First room where you in then the room that goes to.
-	doorLivingroomToKitchen.setSpaces(livingRoom, kitchen);
-	doorLivingroomToHallway.setSpaces(livingRoom, hallway);
-	doorHallwayToOutside.setSpaces(hallway, outside);
-
-	//set current space to room
-	currentSpace = livingRoom;
-
 
 	//List of random default answer
 	let defaultAnswer = ["be more specific. Don't understand: ",
@@ -146,6 +113,13 @@ $(document).ready(function () {
 		"You're just babbling... "];
 
 
+	// Set the placeholder attribute to "type here"
+	$("#typeHere").attr("placeholder", "Type here");
+
+	// Clear the input field when it's selected
+	$("#typeHere").on("focus", function () {
+		$(this).val("");
+	});
 
 
 	//Checks on keydown if "enter" is pressed 
@@ -153,6 +127,7 @@ $(document).ready(function () {
 		if (keyPressed.which === 13) {
 			//set variable with the value of the input field
 			whatIsTyped = $("#typeHere").val();
+
 			//make the input field empty
 			$("#typeHere").val("");
 			//check the switch function is there is something that is typed right
@@ -173,13 +148,8 @@ $(document).ready(function () {
 			strings: [answer],
 			typeSpeed: 20,
 			backSpeed: 0,
-
 		});
-
 	}
-
-
-
 
 	/*
 	//	//Functions that are triggered by certain phrases
@@ -193,15 +163,6 @@ $(document).ready(function () {
 
 	function checkContainer(container) {
 		let answer;
-		/*console.log(container);
-		if (container == undefined) {
-			answer = "there are no items";
-			console.log("there are no items");
-		} else {
-			answer = "there are items";
-			console.log("there are items");
-		}
-		*/
 		if (container.objects.length <= 0 || container.objects.length == undefined) {
 			answer = "There are no items."
 		} else {
@@ -210,7 +171,7 @@ $(document).ready(function () {
 			for (let i = 0; i < container.objects.length; i++) {
 				if (i === 0) {
 					answer = answer + container.objects[i].getName();
-				} else if (i < container.length - 1) {
+				} else if (i < container.objects.length - 1) {
 					answer = answer + ", " + container.objects[i].getName();
 				} else {
 					let name = container.objects[i].getName();
@@ -225,9 +186,36 @@ $(document).ready(function () {
 			}
 		}
 		return answer;
-
 	}
 
+
+	function checkInventory() {
+		let answer;
+		if (currentInventory.length <= 0 || currentInventory.length == undefined) {
+			answer = "There are no items."
+		} else {
+			answer = "You have in your inventory: ";
+
+			for (let i = 0; i < currentInventory.length; i++) {
+				if (i === 0) {
+					answer = answer + currentInventory[i].getName();
+				} else if (i < currentInventory.length - 1) {
+					answer = answer + ", " + currentInventory[i].getName();
+				} else {
+					let name = currentInventory[i].getName();
+					let firstLetter = name[0].toLowerCase();
+					if (firstLetter === "a" || firstLetter === "o" || firstLetter === "u" || firstLetter === "i" || firstLetter === "e") {
+						answer = answer + " and an " + name;
+					} else {
+						answer = answer + " and a " + name;
+					}
+				}
+
+			}
+		}
+		return answer;
+
+	}
 
 	function getItem(nameItem, container) {
 		let answer;
@@ -308,66 +296,95 @@ $(document).ready(function () {
 		return answer;
 	}
 
+	//first line to show in the adventure
+	//set the main story here 
+	let mainStory1_01 = "You wake up in a room on the floor.<br>And you don't know where you are...";
+	$("#mainStory").html(mainStory1_01);
 
 
+
+
+	//set the answers
 	function checkWhatIsTyped(typed) {
 
 		let convertType = typed.toLowerCase();
-
+		let item;
+		let answers;
 		switch (convertType) {
-			case includes("look around"):
+			case "look around":
+			case "look space":
 				//give description of the space.
 				setAnswer("#responseBlok", lookAround(), true);
-
+				break;
 			case "stand up":
 			case "get up":
 				setAnswer("#responseBlok", "You get up", true);
 				break;
-			case includes("to wooden door"):
+			case "walk to wooden door":
+			case "go to wooden door":
 				setAnswer("#responseBlok", checkItemInCurrentRoom("wooden door"), true);
 				break;
-			case includes("to green door"):
+			case "walk to wooden green door":
+			case "go to wooden green door":
+			case "walk to green door":
+			case "go to green door":
 				setAnswer("#responseBlok", checkItemInCurrentRoom("wooden green door"), true);
 				break;
-			case "walk to man":
-			case "go to man":
+			case "walk to person":
+			case "go to person":
 				setAnswer("#responseBlok", checkItemInCurrentRoom("Jim"), true);
 				break;
 			case "open door":
 				setAnswer("#responseBlok", "Which door? ", true);
 				break;
-			case includes("coffee table"):
-				setAnswer("#responseBlok", checkContainer(currentSpace.objects[2]), true);
+			case "look at coffee table":
+			case "see coffee table":
+			case "check coffee table":
+
+				setAnswer("#responseBlok", checkContainer(coffeeTable), true);
 				break;
-			case includes("rusty key"):
+			case "take rusty key":
+			case "get rusty key":
+			case "grab rusty key":
+			case "pick up rusty key":
 				setAnswer("#responseBlok", getItem("rusty key", currentSpace.objects[2]), true);
 				break;
-			case includes("what is your name"):
+			case "what is your name?":
+			case "what is your name":
 				if (checkCharacterInRoom("Jim")) {
 					setAnswer("#responseBlok", "Nobody here...", true);
 				} else {
 					setAnswer("#responseBlok", person.getName(), true);
 				}
 				break;
-			case includes("which key fits in the door"):
+			case "which key fits in the door?":
+			case "which key fits in the door":
 				if (checkCharacterInRoom("Jim")) {
 					setAnswer("#responseBlok", person.getAnswer("which key fits in the door"), true);
 				} else {
 					setAnswer("#responseBlok", "There is nodbody in the room...", true);
 				}
 				break;
-			case includes("what are you doing here"):
+			case "what are you doing here?":
+			case "what are you doing here":
 				setAnswer("#responseBlok", person.getAnswer("what are you doing here"), true);
 				break;
-			case includes("blue key"):
+			case "take blue key":
+			case "get blue key":
+			case "grab blue key":
+			case "pick up blue key":
 				setAnswer("#responseBlok", getItem("blue key", currentSpace.objects[2]), true);
 				break;
-			case includes("ball"):
+			case "take ball":
+			case "get ball":
+			case "grab ball":
+			case "pick up ball":
 				setAnswer("#responseBlok", getItem("ball", currentSpace.objects[2]), true);
 				break;
-			case "pick up apple":
-			case "pick up the apple":
-			case "pick up an apple":
+			case "take apple":
+			case "get apple":
+			case "grab apple":
+			case "pick up appple":
 				setAnswer("#responseBlok", getItem("apple", currentSpace.objects[2]), true);
 				break;
 			case "open door with key":
@@ -378,7 +395,7 @@ $(document).ready(function () {
 			case "open green door":
 				answers = doorLivingroomToHallway.openDoor();
 				if (jQuery.type(answers) === "array") {
-					setAnswer("#mainStory", answers[1], true);
+					setAnswer("#mainstoryText", answers[1], true);
 					setAnswer("#responseBlok", answers[0], true);
 				} else {
 					setAnswer("#responseBlok", answers, true);
@@ -388,7 +405,7 @@ $(document).ready(function () {
 				answers = doorLivingroomToKitchen.openDoor();
 
 				if (jQuery.type(answers) === "array") {
-					setAnswer("#mainStory", answers[1], true);
+					setAnswer("#mainstoryText", answers[1], true);
 					setAnswer("#responseBlok", answers[0], true);
 				} else {
 					setAnswer("#responseBlok", answers, true);
@@ -405,7 +422,7 @@ $(document).ready(function () {
 
 				answers = doorLivingroomToHallway.openDoor();
 				if (jQuery.type(answers) === "array") {
-					setAnswer("#mainStory", answers[1], true);
+					setAnswer("#mainstoryText", answers[1], true);
 					setAnswer("#responseBlok", answers[0], true);
 				} else {
 					setAnswer("#responseBlok", answers, true);
@@ -422,7 +439,7 @@ $(document).ready(function () {
 				answers = doorLivingroomToHallway.openDoor();
 
 				if (jQuery.type(answers) === "array") {
-					setAnswer("#mainStory", answers[1], true);
+					setAnswer("#mainstoryText", answers[1], true);
 					setAnswer("#responseBlok", answers[0], true);
 				} else {
 					setAnswer("#responseBlok", answers, true);
@@ -439,7 +456,7 @@ $(document).ready(function () {
 
 				answers = doorHallwayToOutside.openDoor();
 				if (jQuery.type(answers) === "array") {
-					setAnswer("#mainStory", answers[1], true);
+					setAnswer("#mainstoryText", answers[1], true);
 					setAnswer("#responseBlok", answers[0], true);
 				} else {
 					setAnswer("#responseBlok", answers, true);
@@ -456,7 +473,7 @@ $(document).ready(function () {
 
 				answers = doorHallwayToOutside.openDoor();
 				if (jQuery.type(answers) === "array") {
-					setAnswer("#mainStory", answers[1], true);
+					setAnswer("#mainstoryText", answers[1], true);
 					setAnswer("#responseBlok", answers[0], true);
 				} else {
 					setAnswer("#responseBlok", answers, true);
@@ -466,7 +483,7 @@ $(document).ready(function () {
 				answers = doorHallwayToOutside.openDoor();
 
 				if (jQuery.type(answers) === "array") {
-					setAnswer("#mainStory", answers[1], true);
+					setAnswer("#mainstoryText", answers[1], true);
 					setAnswer("#responseBlok", answers[0], true);
 				} else {
 					setAnswer("#responseBlok", answers, true);
@@ -474,7 +491,7 @@ $(document).ready(function () {
 				break;
 			case "check my inventory":
 			case "check inventory":
-				setAnswer("#responseBlok", checkContainer(currentInventory), true);
+				setAnswer("#responseBlok", checkInventory(), true);
 				break;
 			case "eat apple":
 				item = checkItemInventory("apple");
@@ -488,5 +505,8 @@ $(document).ready(function () {
 				setAnswer("#responseBlok", giveRandomAnswer(defaultAnswer) + convertType, true);
 		}
 	}
+
+
+
 
 });

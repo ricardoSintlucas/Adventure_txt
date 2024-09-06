@@ -7,9 +7,8 @@ let globalID = null;
 //set current space var
 let currentSpace;
 
-//current inventory
+//set current inventory var
 let currentInventory = [];
-
 
 function GiveUniqueID() {
 	if (globalID === null) {
@@ -165,7 +164,7 @@ function Room(name, description, objects) {
 Room.prototype = new StaticItem();
 Room.prototype.constructor = Room;
 
-
+//Deze kan weg
 //Character 
 function Character(name, description, objects, questionsAnswers) {
 	//public attributes
@@ -191,10 +190,3 @@ function Character(name, description, objects, questionsAnswers) {
 //Character is child of StaticItem
 Character.prototype = new StaticItem();
 Character.prototype.constructor = Character;
-
-
-
-
-
-
-
